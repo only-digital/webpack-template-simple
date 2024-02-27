@@ -1,4 +1,3 @@
-import { ITransitionData } from '@barba/core/dist/core/src/defs';
 import Component from '@/base/component';
 import Example from '@/components/ui/example/example';
 
@@ -7,43 +6,23 @@ const allComponents: Record<string, any & Component<HTMLElement>> = {
     example: Example,
 };
 
-export default {
-    namespace: 'common',
-    components: <Component<HTMLElement>[]>[],
-    async beforeEnter({ next: { container, url } }: ITransitionData) {
+const initIndexPage = () => {
+    // Стандартная инициализация компонентов
+    const existedComponents = Array.from(document.querySelectorAll<HTMLElement>('[data-component]'));
+
+    existedComponents.map((component) => {
         try {
-            // Стандартная инициализация компонентов
-            const existedComponents = Array.from(container.querySelectorAll<HTMLElement>('[data-component]'));
-
-            this.components = existedComponents.map((component) => {
-                try {
-                    return new allComponents[component.dataset.component!]({
-                        name: component.dataset.component,
-                        component: component,
-                    });
-                } catch (e: any) {
-                    console.error(`Ошибка во время инициализации компонента: ${component.dataset.component}\n\n${e}`);
-                }
+            return new allComponents[component.dataset.component!]({
+                name: component.dataset.component,
+                component: component,
             });
-
-            // Дополнительная логика для инициализации страницы
-            // ...
-
-        } catch (e) {
-            console.error(e);
+        } catch (e: any) {
+            console.error(`Ошибка во время инициализации компонента: ${component.dataset.component}\n\n${e}`);
         }
-    },
-    beforeLeave() {
-        this.components.forEach((component) => {
-            try {
-                component.destroy()
-            } catch (e: any) {
-                console.error(`Ошибка во время удаления компонента: ${component.nRootName}\n\n${e}`);
-            }
-        })
-        this.components = [];
-    },
+    });
 
-    afterLeave() {
-    },
-};
+    // Дополнительная логика для инициализации страницы
+    // ...
+}
+
+export default initIndexPage;
